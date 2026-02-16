@@ -10,14 +10,14 @@ import com.intellij.ui.components.JBPanel
 import com.intellij.ui.content.ContentFactory
 import org.jetbrains.plugins.template.MyBundle
 import org.jetbrains.plugins.template.services.MyProjectService
+import java.awt.BorderLayout
+import java.awt.Font
 import javax.swing.JButton
+import javax.swing.JTextArea
+import javax.swing.border.EmptyBorder
 
 
 class MyToolWindowFactory : ToolWindowFactory {
-
-    init {
-        thisLogger().warn("Don't forget to remove all non-needed sample code files with their corresponding registration entries in `plugin.xml`.")
-    }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val myToolWindow = MyToolWindow(toolWindow)
@@ -32,14 +32,33 @@ class MyToolWindowFactory : ToolWindowFactory {
         private val service = toolWindow.project.service<MyProjectService>()
 
         fun getContent() = JBPanel<JBPanel<*>>().apply {
-            val label = JBLabel(MyBundle.message("randomLabel", "?"))
+            layout = BorderLayout(10, 10)
+            border = EmptyBorder(20, 20, 20, 20)
+            
+            val titleLabel = JBLabel(MyBundle.message("dreamlife.title")).apply {
+                font = font.deriveFont(Font.BOLD, 18f)
+            }
+            
+            val quoteArea = JTextArea(MyBundle.message("dreamlife.welcome")).apply {
+                isEditable = false
+                lineWrap = true
+                wrapStyleWord = true
+                font = font.deriveFont(14f)
+                rows = 6
+                background = null
+            }
 
-            add(label)
-            add(JButton(MyBundle.message("shuffle")).apply {
-                addActionListener {
-                    label.text = MyBundle.message("randomLabel", service.getRandomNumber())
-                }
-            })
+            val buttonPanel = JBPanel<JBPanel<*>>().apply {
+                add(JButton(MyBundle.message("dreamlife.inspire")).apply {
+                    addActionListener {
+                        quoteArea.text = service.getRandomQuote()
+                    }
+                })
+            }
+            
+            add(titleLabel, BorderLayout.NORTH)
+            add(quoteArea, BorderLayout.CENTER)
+            add(buttonPanel, BorderLayout.SOUTH)
         }
     }
 }
